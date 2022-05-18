@@ -1,9 +1,9 @@
 version: "3"
 services:
-  telldus-core-mqtt:
+  my-telldus-core-mqtt:
     build:
       context: ../
-    container_name: dev_telldus-core-mqtt
+    container_name: dev_my_telldus-core-mqtt
     restart: unless-stopped
     depends_on:
       - mosquitto
@@ -12,7 +12,7 @@ services:
       - TDM_MQTT_USER=telldus-core-mqtt
       - TDM_MQTT_PASS=telldus-core-mqtt
     devices:
-      - /dev/bus/usb:/dev/bus/usb:rwm
+      - /dev/null:/dev/bus/usb:rwm
     volumes:
       - ./tellstick.conf:/etc/tellstick.conf:ro
 
@@ -24,7 +24,7 @@ services:
       - "1883:1883"
     volumes:
       - mosquitto_data:/mosquitto/data
-      - ./mosquitto:/mosquitto/config
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   home-assistant:
     container_name: home-assistant
