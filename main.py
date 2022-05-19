@@ -79,18 +79,24 @@ def subscribe_device(client: mqtt_client):
                 logging.debug('[DEVICE] Sending command DIM "%s" to device '
                               'id %s', msg.payload.decode(), device_id)
                 cmd_status = d.dim(device_id, int(msg.payload.decode()))
+            elif action == 'set':
+                if int(msg.payload.decode() == 0):
+                    logging.debug('[DEVICE] Sending light OFF "%s" to device '
+                              'id %s', msg.payload.decode(), device_id)
+                    cmd_status = d.turn_off(device_id)
+                else:
+                    logging.debug('[DEVICE] Sending light ON ONCE "%s" to device '
+                              'id %s', msg.payload.decode(), device_id)
+                    cmd_status = d.turn_on_once(device_id)
             else:
-                if int(msg.payload.decode()) == int(const.TELLSTICK_TURNON):
-                    logging.debug('[DEVICE] Sending command DIM 255 to device '
-                                  'id %s', device_id)
-                    cmd_status = d.dim(device_id, 255)
+                logging.debug('[DEVICE] Unknown light action "%s" to device "%s"', action)
+        
+        elif module == 'brightness':
+                logging.debug('[DEVICE] Sending command DIM (brightness) "%s" to device '
+                              'id %s', msg.payload.decode(), device_id)
+                cmd_status = d.dim(device_id, int(msg.payload.decode()))
 
-                if int(msg.payload.decode()) == int(const.TELLSTICK_TURNOFF):
-                    logging.debug('[DEVICE] Sending command DIM 0 to device '
-                                  'id %s', device_id)
-                    cmd_status = d.dim(device_id, 0)
-
-        if action != 'dim' and module != 'light':
+        elif module == 'switch':
             if int(msg.payload.decode()) == int(const.TELLSTICK_TURNON):
                 topic = d.create_topic(device_id, 'switch')
                 topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNON)
@@ -134,7 +140,7 @@ def subscribe_device(client: mqtt_client):
         #                 device_id)
         #     cmd_status = d.stop(device_id)
 
-        if not cmd_status:
+        elif not cmd_status:
             logging.debug('[DEVICE] Command "%s" not supported, please open'
                           ' a github issue with this message.', msg)
 
@@ -169,8 +175,8 @@ def device_event(id_, method, data, cid):
 
     if method == const.TELLSTICK_DIM:
         logging.debug('[DEVICE EVENT LIGHT] %s', string)
-        topic = d.create_topic(id_, 'light')
-        topic_data = d.create_topic_data('light', data)
+        topic = d.create_topic(id_, 'brightness')
+        topic_data = d.create_topic_data('brightness', data)
     else:
         logging.debug('[DEVICE EVENT SWITCH] %s', string)
         topic = d.create_topic(id_, 'switch')

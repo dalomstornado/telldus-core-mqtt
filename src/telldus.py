@@ -162,6 +162,9 @@ class Telldus:
         if model == 'light':
             topic = '{}/{}/brightness/dim'.format(
                 self.config['home_assistant']['state_topic'], type_id)
+        elif model == 'brightness':
+            topic = '{}/{}/brightness'.format(
+                self.config['home_assistant']['state_topic'], type_id)
         else:
             topic = '{}/{}/{}/state'.format(
                 self.config['home_assistant']['state_topic'], type_id, model)
@@ -313,6 +316,14 @@ class Device(Telldus):
             if device is not None:
                 for _i in range(int(self.config['telldus']['repeat_cmd'])):
                     device.turn_on()
+                return True
+            return False
+
+    def turn_on_once(self, device_id):
+        with THREADING_RLOCK:
+            device = self._find_device(device_id)
+            if device is not None:
+                device.turn_on()
                 return True
             return False
 
