@@ -159,8 +159,16 @@ class Telldus:
         return config_data
 
     def create_topic(self, type_id, model):
+        # SET
+        # {
+        #    "state": "ON", // Or "OFF", "TOGGLE"
+        #    "brightness": 255, // Value between 0 and 255
+        #    "color": {"x": 0.123, "y": 0.123} // Color in XY
+        # }
+
+
         if model == 'light':
-            topic = '{}/{}/brightness/dim'.format(
+            topic = '{}/{}/light'.format(
                 self.config['home_assistant']['state_topic'], type_id)
         elif model == 'brightness':
             topic = '{}/{}/brightness'.format(

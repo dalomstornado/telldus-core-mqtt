@@ -75,6 +75,8 @@ def subscribe_device(client: mqtt_client):
         cmd_status = False
 
         if module == 'light':
+            payload = int(msg.payload.decode())
+
             if action == 'dim':
                 logging.debug('[DEVICE] Sending command DIM "%s" to device '
                               'id %s', msg.payload.decode(), device_id)
@@ -98,18 +100,18 @@ def subscribe_device(client: mqtt_client):
 
         elif module == 'switch':
             if int(msg.payload.decode()) == int(const.TELLSTICK_TURNON):
-                topic = d.create_topic(device_id, 'switch')
-                topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNON)
-                publish_mqtt(mqtt_device, topic, topic_data)
+                # topic = d.create_topic(device_id, 'switch')
+                # topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNON)
+                # publish_mqtt(mqtt_device, topic, topic_data)
 
                 logging.debug('[DEVICE] Sending command ON to device '
                               'id %s', device_id)
                 cmd_status = d.turn_on(device_id)
 
             if int(msg.payload.decode()) == int(const.TELLSTICK_TURNOFF):
-                topic = d.create_topic(device_id, 'switch')
-                topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNOFF)
-                publish_mqtt(mqtt_device, topic, topic_data)
+                # topic = d.create_topic(device_id, 'switch')
+                # topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNOFF)
+                # publish_mqtt(mqtt_device, topic, topic_data)
 
                 logging.debug('[DEVICE] Sending command OFF to device '
                               'id %s', device_id)
@@ -173,7 +175,20 @@ def device_event(id_, method, data, cid):
     if method == const.TELLSTICK_DIM:
         string += ' [{0}]'.format(data)
 
-    if method == const.TELLSTICK_DIM:
+    # TODO: remove hardcoded dimmer ids
+    if id_ == 8 or id_ == 9 or id_ == 10 or id_ == 11 or id_ == 12:
+        logging.debug('[DEVICE EVENT DIMMER LIGHT] %s', string)
+
+        if method == const.TELLSTICK_TURNOFF:
+            topic = d.create_topic(id_, 'light')
+            topic_data = d.create_topic_data('light', 0)
+        elif method == const.TELLSTICK_TURNON:
+            topic = d.create_topic(id_, 'light')
+            topic_data = d.create_topic_data('light', 255)
+        elif method == const.TELLSTICK_DIM:
+            topic = d.create_topic(id_, 'brightness')
+            topic_data = d.create_topic_data('brightness', data)
+    elif method == const.TELLSTICK_DIM:
         logging.debug('[DEVICE EVENT LIGHT] %s', string)
         topic = d.create_topic(id_, 'brightness')
         topic_data = d.create_topic_data('brightness', data)
@@ -182,7 +197,6 @@ def device_event(id_, method, data, cid):
         topic = d.create_topic(id_, 'switch')
         topic_data = d.create_topic_data('switch', method)
     publish_mqtt(mqtt_device, topic, topic_data)
-
 
 def sensor_event(protocol, model, id_, data_type, value, timestamp, cid):
     # pylint: disable=unused-argument
