@@ -355,55 +355,12 @@ class Device(Telldus):
         logging.warning('Dim value "%d" not in range 0 - 255', int(value))
         return False
 
-    # def bell(self, device_id):
-    #     device = self._find_device(device_id)
-    #     if device is not None:
-    #         for _i in range(int(self.config['telldus']['repeat_cmd'])):
-    #             device.bell()
-    #         return True
-    #     return False
-
-    # def execute(self, device_id):
-    #     device = self._find_device(device_id)
-    #     if device is not None:
-    #         for _i in range(int(self.config['telldus']['repeat_cmd'])):
-    #             device.execute()
-    #         return True
-    #     return False
-
-    # def up(self, device_id):
-    #     # pylint: disable=invalid-name
-    #     device = self._find_device(device_id)
-    #     if device is not None:
-    #         for _i in range(int(self.config['telldus']['repeat_cmd'])):
-    #             device.up()
-    #         return True
-    #     return False
-
-    # def down(self, device_id):
-    #     device = self._find_device(device_id)
-    #     if device is not None:
-    #         for _i in range(int(self.config['telldus']['repeat_cmd'])):
-    #             device.down()
-    #         return True
-    #     return False
-
-    # def stop(self, device_id):
-    #     device = self._find_device(device_id)
-    #     if device is not None:
-    #         for _i in range(int(self.config['telldus']['repeat_cmd'])):
-    #             device.stop()
-    #         return True
-    #     return False
-
     def _find_device(self, device_id):
         for device in self.core.devices():
             if int(device.id) == int(device_id):
                 return device
         logging.warning('Device id "%d" not found', int(device_id))
         return None
-
-
 class Command(Telldus):
     def __init__(self, core=None):
         super().__init__(core=core)

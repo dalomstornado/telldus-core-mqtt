@@ -74,80 +74,37 @@ def subscribe_device(client: mqtt_client):
         action = msg.topic.split('/')[3]
         cmd_status = False
 
+        payload = int(msg.payload.decode())
         if module == 'light':
-            payload = int(msg.payload.decode())
-
             if action == 'dim':
-                logging.debug('[DEVICE] Sending command DIM "%s" to device '
-                              'id %s', msg.payload.decode(), device_id)
-                cmd_status = d.dim(device_id, int(msg.payload.decode()))
+                logging.debug('[DEVICE] Sending command DIM "%s" to device id "%s"', payload, device_id)
+                cmd_status = d.dim(device_id, payload)
             elif action == 'set':
-                if int(msg.payload.decode() == 0):
-                    logging.debug('[DEVICE] Sending light OFF "%s" to device '
-                              'id %s', msg.payload.decode(), device_id)
+                if payload == 0:
+                    logging.debug('[DEVICE] Sending light OFF "%s" to device id "%s"', payload, device_id)
                     cmd_status = d.turn_off(device_id)
                 else:
-                    logging.debug('[DEVICE] Sending light ON ONCE "%s" to device '
-                              'id %s', msg.payload.decode(), device_id)
+                    logging.debug('[DEVICE] Sending light ON ONCE "%s" to device id "%s"', payload, device_id)
                     cmd_status = d.turn_on_once(device_id)
             else:
-                logging.debug('[DEVICE] Unknown light action "%s" to device "%s"', action)
+                logging.debug('[DEVICE] Unknown light action "%s"', action)
         
         elif module == 'brightness':
-                logging.debug('[DEVICE] Sending command DIM (brightness) "%s" to device '
-                              'id %s', msg.payload.decode(), device_id)
-                cmd_status = d.dim(device_id, int(msg.payload.decode()))
-
+                logging.debug('[DEVICE] Sending command DIM (brightness) "%s" to device id "%s"', payload, device_id)
+                cmd_status = d.dim(device_id, payload)
+        
         elif module == 'switch':
-            if int(msg.payload.decode()) == int(const.TELLSTICK_TURNON):
-                # topic = d.create_topic(device_id, 'switch')
-                # topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNON)
-                # publish_mqtt(mqtt_device, topic, topic_data)
-
-                logging.debug('[DEVICE] Sending command ON to device '
-                              'id %s', device_id)
+            if payload == int(const.TELLSTICK_TURNON):
+                logging.debug('[DEVICE] Sending command ON to device id "%s"', device_id)
                 cmd_status = d.turn_on(device_id)
-
-            if int(msg.payload.decode()) == int(const.TELLSTICK_TURNOFF):
-                # topic = d.create_topic(device_id, 'switch')
-                # topic_data = d.create_topic_data('switch', const.TELLSTICK_TURNOFF)
-                # publish_mqtt(mqtt_device, topic, topic_data)
-
-                logging.debug('[DEVICE] Sending command OFF to device '
-                              'id %s', device_id)
+            elif payload == int(const.TELLSTICK_TURNOFF):
+                logging.debug('[DEVICE] Sending command OFF to device id "%s', device_id)
                 cmd_status = d.turn_off(device_id)
-
-        # if int(msg.payload.decode()) == int(const.TELLSTICK_BELL):
-        #     logging.debug('[DEVICE] Sending command BELL to device '
-        #                 'id %s', device_id)
-        #     cmd_status = d.bell(device_id)
-
-        # if int(msg.payload.decode()) == int(const.TELLSTICK_EXECUTE):
-        #     logging.debug('[DEVICE] Sending command EXECUTE to device '
-        #                 'id %s', device_id)
-        #     cmd_status = d.execute(device_id)
-
-        # if int(msg.payload.decode()) == int(const.TELLSTICK_UP):
-        #     logging.debug('[DEVICE] Sending command UP to device id %s',
-        #                 device_id)
-        #     cmd_status = d.up(device_id)
-
-        # if int(msg.payload.decode()) == int(const.TELLSTICK_DOWN):
-        #     logging.debug('[DEVICE] Sending command DOWN to device id %s',
-        #                 device_id)
-        #     cmd_status = d.down(device_id)
-
-        # if int(msg.payload.decode()) == int(const.TELLSTICK_STOP):
-        #     logging.debug('[DEVICE] Sending command STOP to device id %s',
-        #                 device_id)
-        #     cmd_status = d.stop(device_id)
-
+        
         elif not cmd_status:
-            logging.debug('[DEVICE] Command "%s" not supported, please open'
-                          ' a github issue with this message.', msg)
+            logging.debug('[DEVICE] Command "%s" not supported, please open a github issue with this message.', msg)
 
-    client.subscribe('{}/+/+/set'.format(
-        config['home_assistant']['state_topic']))
+    client.subscribe('{}/+/+/set'.format(config['home_assistant']['state_topic']))
     client.on_message = on_message
 
 
@@ -178,7 +135,6 @@ def device_event(id_, method, data, cid):
     # TODO: remove hardcoded dimmer ids
     if id_ == 8 or id_ == 9 or id_ == 10 or id_ == 11 or id_ == 12:
         logging.debug('[DEVICE EVENT DIMMER LIGHT] %s', string)
-
         if method == const.TELLSTICK_TURNOFF:
             topic = d.create_topic(id_, 'light')
             topic_data = d.create_topic_data('light', 0)
