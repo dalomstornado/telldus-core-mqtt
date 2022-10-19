@@ -77,32 +77,32 @@ def subscribe_device(client: mqtt_client):
         payload = int(msg.payload.decode())
         if module == 'light':
             if action == 'dim':
-                logging.debug('[DEVICE] Sending command DIM "%s" to device id "%s"', payload, device_id)
+                logging.info('[DEVICE] Sending command DIM "%s" to device id "%s"', payload, device_id)
                 cmd_status = d.dim(device_id, payload)
             elif action == 'set':
                 if payload == 0:
-                    logging.debug('[DEVICE] Sending light OFF "%s" to device id "%s"', payload, device_id)
+                    logging.info('[DEVICE] Sending light OFF "%s" to device id "%s"', payload, device_id)
                     cmd_status = d.turn_off(device_id)
                 else:
-                    logging.debug('[DEVICE] Sending light ON ONCE "%s" to device id "%s"', payload, device_id)
+                    logging.info('[DEVICE] Sending light ON ONCE "%s" to device id "%s"', payload, device_id)
                     cmd_status = d.turn_on_once(device_id)
             else:
-                logging.debug('[DEVICE] Unknown light action "%s"', action)
+                logging.info('[DEVICE] Unknown light action "%s"', action)
         
         elif module == 'brightness':
-                logging.debug('[DEVICE] Sending command DIM (brightness) "%s" to device id "%s"', payload, device_id)
+                logging.info('[DEVICE] Sending command DIM (brightness) "%s" to device id "%s"', payload, device_id)
                 cmd_status = d.dim(device_id, payload)
         
         elif module == 'switch':
             if payload == int(const.TELLSTICK_TURNON):
-                logging.debug('[DEVICE] Sending command ON to device id "%s"', device_id)
+                logging.info('[DEVICE] Sending command ON to device id "%s"', device_id)
                 cmd_status = d.turn_on(device_id)
             elif payload == int(const.TELLSTICK_TURNOFF):
-                logging.debug('[DEVICE] Sending command OFF to device id "%s', device_id)
+                logging.info('[DEVICE] Sending command OFF to device id "%s', device_id)
                 cmd_status = d.turn_off(device_id)
         
         elif not cmd_status:
-            logging.debug('[DEVICE] Command "%s" not supported, please open a github issue with this message.', msg)
+            logging.error('[DEVICE] Command "%s" not supported, please open a github issue with this message.', msg)
 
     client.subscribe('{}/+/+/set'.format(config['home_assistant']['state_topic']))
     client.on_message = on_message
