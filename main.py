@@ -83,9 +83,6 @@ def subscribe_device(client: mqtt_client):
                 if payload == 0:
                     logging.info('[DEVICE] Sending light OFF "%s" to device id "%s"', payload, device_id)
                     cmd_status = d.turn_off(device_id)
-                else:
-                    logging.info('[DEVICE] Sending light ON ONCE "%s" to device id "%s"', payload, device_id)
-                    cmd_status = d.turn_on_once(device_id)
             else:
                 logging.info('[DEVICE] Unknown light action "%s"', action)
         
