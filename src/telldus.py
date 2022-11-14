@@ -121,7 +121,13 @@ class Telldus:
             config_data['brightness_command_topic'] = bt_command['command']
 
         config_data['state_topic'] = state_topic
-        config_data['value_template'] = '{{ value_json.%s }}' % extra['type']
+        
+        # state value template for dimmers 
+        if (device.id == 8 or device.id == 9 or device.id == 10 or device.id == 11 or device.id == 12):
+            config_data['state_value_template'] = '{{ value_json.%s }}' % extra['type']
+        else:
+            config_data['value_template'] = '{{ value_json.%s }}' % extra['type']
+
         config_data['device']['identifiers'] = []
         config_data['device']['identifiers'].append('{}_{}'.format(
             device.id, device.model))
