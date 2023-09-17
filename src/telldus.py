@@ -139,7 +139,7 @@ class Telldus:
             # config_data['device_class'] = "None"
             config_data['payload_on'] = const.TELLSTICK_TURNON
             config_data['payload_off'] = const.TELLSTICK_TURNOFF
-            config_data['expire_after'] = 60 * 60 * 24
+            #config_data['expire_after'] = 60 * 60 * 24
             config_data['force_update'] = True
 
         # device only
